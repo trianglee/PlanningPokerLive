@@ -81,18 +81,30 @@
                 }
                 
                 g_stage.addChild(rect);
-                
+
+                // Required scale from the t-shirt image to the required card 
+                // width and height.
                 var scaleX = width / g_tshirtImage.width;
                 var scaleY = height / g_tshirtImage.height;
                 
+                // To preserve aspect ratio, choose the smaller scale.
                 var scale = Math.min(scaleX, scaleY);
                 
+                // Calculate the actual width and height of the t-shirt image.
                 var actualWidth = g_tshirtImage.width * scale;
                 var actualHeight = g_tshirtImage.height * scale;
                 
+                // Based on the actual width and height, find the correct offset
+                // such that the image is centered in the card.
                 var xOffset = ( width - actualWidth ) / 2;
                 var yOffset = ( height - actualHeight ) / 2;
 
+                // Calculate the required font size, given a font size for a
+                // certain width.
+                var baselineWidth = 180;
+                var fontSizeForBaselineWidth = 3;
+                var actualFontSize = actualWidth / baselineWidth * fontSizeForBaselineWidth;
+                
                 var bitmap = new createjs.Bitmap(g_tshirtImage);
                 bitmap.x = x + xOffset;
                 bitmap.y = y + yOffset;
@@ -100,7 +112,7 @@
                 bitmap.scaleY = scale;
                 g_stage.addChild(bitmap);
 
-                var text = new createjs.Text(title, "3em Arial", "black");
+                var text = new createjs.Text(title, actualFontSize + "em Arial", "black");
                 text.x = x + width / 2;
                 text.y = y + height * 0.4;
                 text.textBaseline = "top";
