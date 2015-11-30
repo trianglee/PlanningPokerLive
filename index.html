@@ -20,7 +20,7 @@
             "use strict";
             
             var g_stage;
-            var g_selectedCardTitle = "";
+            var g_selectedCardTitle = null;
             
             var g_tshirtImage;
             
@@ -59,12 +59,8 @@
                 g_stage.update();
             }
             
-            function addCard(x, y, width, height, title, color, respondToClick) {
+            function addCard(x, y, width, height, title, color, onClickEvent) {
               
-                if (typeof(respondToClick) == "undefined") {
-                    respondToClick = true;
-                }
-                
                 var cardRoundedRadius = width * 0.05;
 
                 var rect = new createjs.Shape();
@@ -76,9 +72,7 @@
                                    height, 
                                    cardRoundedRadius);
 
-                if (respondToClick) {
-                    rect.on("click", onCardClick, null, false, title);
-                }
+                rect.on("click", onClickEvent, null, false, title);
                 
                 g_stage.addChild(rect);
 
@@ -148,7 +142,7 @@
                     var cardX = cardRegionWidth*x + cardWidthPadding;
                     var cardY = cardRegionHeight*y + cardHeightPadding;
 
-                    addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue");
+                    addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue", onCardClick);
 
                     x++;
                     if (x >= cardsInRow) {
@@ -161,7 +155,7 @@
             
             function addSelectedCard() {
                 
-                if (g_selectedCardTitle === "") {
+                if (g_selectedCardTitle === null) {
                     return;
                 }
                 
@@ -176,12 +170,18 @@
                 var cardX = cardWidthPadding;
                 var cardY = cardHeightPadding;
                 
-                addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, "green", false);
+                addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, "green", onLargeCardClick);
             }
 
             function onCardClick(event, cardTitle) {
           
                 g_selectedCardTitle = cardTitle;
+                drawEverything();
+            }
+
+            function onLargeCardClick(event, cardTitle) {
+          
+                g_selectedCardTitle = null;
                 drawEverything();
             }
 
