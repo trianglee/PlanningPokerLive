@@ -122,7 +122,9 @@
 
             function addCards() {
               
-                var cardsInRow = 3;
+                // Hard-coded amount and layout of cards.
+                var cardValues = [ "XS", "S", "M", "L", "XL" ];
+                var cardsInRow = 2;
                 var cardsInColumn = 3;
                 
                 var cardPaddingPercentage = 0.05;
@@ -136,24 +138,24 @@
                 var cardWidth = cardRegionWidth * ( 1 - cardPaddingPercentage*2 );
                 var cardHeight = cardRegionHeight * ( 1 - cardPaddingPercentage*2 );
 
-                var cardValues = [ "XS", "S", "M", "L", "XL" ];
-                var curCardValueIndex = 0;
-              
-                for (var y = 0; y < 3; y++) {
-                    for (var x = 0; x < 3; x++) {
+                var x = 0;
+                var y = 0;
+        
+                cardValues.forEach(function(cardValue) {
 
-                        var cardTitle = cardValues[curCardValueIndex];
+                    var cardTitle = cardValue;
 
-                        var cardX = cardRegionWidth*x + cardWidthPadding;
-                        var cardY = cardRegionHeight*y + cardHeightPadding;
-                        
-                        addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue");
+                    var cardX = cardRegionWidth*x + cardWidthPadding;
+                    var cardY = cardRegionHeight*y + cardHeightPadding;
 
-                        // FIXME: Consider how to make this better.
-                        curCardValueIndex++;
-                        curCardValueIndex %= cardValues.length;
+                    addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue");
+
+                    x++;
+                    if (x >= cardsInRow) {
+                        y++;
+                        x = 0;
                     }
-                }
+                });
               
             }
             
