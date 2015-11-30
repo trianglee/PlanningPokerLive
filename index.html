@@ -59,9 +59,9 @@
                 g_stage.update();
             }
             
-            function addCard(x, y, width, height, title, respondToClick) {
-                
-                if (!respondToClick) {
+            function addCard(x, y, width, height, title, color, respondToClick) {
+              
+                if (typeof(respondToClick) == "undefined") {
                     respondToClick = true;
                 }
                 
@@ -69,7 +69,7 @@
 
                 var rect = new createjs.Shape();
                 rect.graphics
-                    .beginFill("blue")
+                    .beginFill(color)
                     .drawRoundRect(x, 
                                    y, 
                                    width, 
@@ -147,7 +147,7 @@
                         var cardX = cardRegionWidth*x + cardWidthPadding;
                         var cardY = cardRegionHeight*y + cardHeightPadding;
                         
-                        addCard(cardX, cardY, cardWidth, cardHeight, cardTitle);
+                        addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue");
 
                         // FIXME: Consider how to make this better.
                         curCardValueIndex++;
@@ -174,7 +174,7 @@
                 var cardX = cardWidthPadding;
                 var cardY = cardHeightPadding;
                 
-                addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, false);
+                addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, "green", false);
             }
 
             function onCardClick(event, cardTitle) {
