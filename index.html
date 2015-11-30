@@ -81,12 +81,23 @@
                 }
                 
                 g_stage.addChild(rect);
+                
+                var scaleX = width / g_tshirtImage.width;
+                var scaleY = height / g_tshirtImage.height;
+                
+                var scale = Math.min(scaleX, scaleY);
+                
+                var actualWidth = g_tshirtImage.width * scale;
+                var actualHeight = g_tshirtImage.height * scale;
+                
+                var xOffset = ( width - actualWidth ) / 2;
+                var yOffset = ( height - actualHeight ) / 2;
 
                 var bitmap = new createjs.Bitmap(g_tshirtImage);
-                bitmap.x = x;
-                bitmap.y = y;
-                bitmap.scaleX = width / g_tshirtImage.width;
-                bitmap.scaleY = height / g_tshirtImage.height;
+                bitmap.x = x + xOffset;
+                bitmap.y = y + yOffset;
+                bitmap.scaleX = scale;
+                bitmap.scaleY = scale;
                 g_stage.addChild(bitmap);
 
                 var text = new createjs.Text(title, "3em Arial", "black");
