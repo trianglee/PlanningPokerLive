@@ -17,11 +17,22 @@
         </style>
 
         <script>
-          
             var g_stage;
             var g_selectedCardTitle = "";
             
+            var g_tshirtImage;
+            
             function init() {
+                init1();
+            }
+
+            function init1() {
+                g_tshirtImage = new Image();
+                g_tshirtImage.src = "images/t-shirt.png";
+                g_tshirtImage.onload = init2;
+            }
+
+            function init2() {
                 g_stage = new createjs.Stage("canvas");
                 window.addEventListener("resize", resize, false);
                 resize();
@@ -41,6 +52,48 @@
 
                 g_stage.update();
             }
+            
+            function updateStage() {
+                g_stage.update();
+            }
+            
+            function addCard(x, y, width, height, title, respondToClick) {
+                
+                if (!respondToClick) {
+                    respondToClick = true;
+                }
+                
+                cardRoundedRadius = width * 0.05;
+
+                var rect = new createjs.Shape();
+                rect.graphics
+                    .beginFill("blue")
+                    .drawRoundRect(x, 
+                                   y, 
+                                   width, 
+                                   height, 
+                                   cardRoundedRadius);
+
+                if (respondToClick) {
+                    rect.on("click", onCardClick, null, false, title);
+                }
+                
+                g_stage.addChild(rect);
+
+                var bitmap = new createjs.Bitmap(g_tshirtImage);
+                bitmap.x = x;
+                bitmap.y = y;
+                bitmap.scaleX = width / g_tshirtImage.width;
+                bitmap.scaleY = height / g_tshirtImage.height;
+                g_stage.addChild(bitmap);
+
+                var text = new createjs.Text(title, "3em Arial", "black");
+                text.x = x + width / 2;
+                text.y = y + height * 0.4;
+                text.textBaseline = "top";
+                text.textAlign = "center";
+                g_stage.addChild(text);
+            }
 
             function addCards() {
               
@@ -58,9 +111,6 @@
                 cardWidth = cardRegionWidth * ( 1 - cardPaddingPercentage*2 );
                 cardHeight = cardRegionHeight * ( 1 - cardPaddingPercentage*2 );
 
-                cardRoundedRadius = cardWidth * 0.05;
-              
-
                 var cardValues = [ "XS", "S", "M", "L", "XL" ];
                 var curCardValueIndex = 0;
               
@@ -71,25 +121,8 @@
 
                         cardX = cardRegionWidth*x + cardWidthPadding;
                         cardY = cardRegionHeight*y + cardHeightPadding;
-                
-                        var rect = new createjs.Shape();
-                        rect.graphics
-                            .beginFill("blue")
-                            .drawRoundRect(cardX, 
-                                           cardY, 
-                                           cardWidth, 
-                                           cardHeight, 
-                                           cardRoundedRadius);
                         
-                        rect.on("click", onCardClick, null, false, cardTitle);
-                        g_stage.addChild(rect);
-
-                        var text = new createjs.Text(cardTitle, "7em Arial", "black");
-                        text.x = cardX + cardWidth / 2;
-                        text.y = cardY + cardHeight / 2;
-                        text.textBaseline = "middle";
-                        text.textAlign = "center";
-                        g_stage.addChild(text);
+                        addCard(cardX, cardY, cardWidth, cardHeight, cardTitle);
 
                         // FIXME: Consider how to make this better.
                         curCardValueIndex++;
@@ -116,20 +149,7 @@
                 cardX = cardWidthPadding;
                 cardY = cardHeightPadding;
                 
-                cardRoundedRadius = cardWidth * 0.05;
-                
-                var rect = new createjs.Shape();
-                rect.graphics
-                    .beginFill("cyan")
-                    .drawRoundRect(cardX, cardY, cardWidth, cardHeight, cardRoundedRadius);
-                g_stage.addChild(rect);
-                
-                var text = new createjs.Text(g_selectedCardTitle, "20em Arial", "black");
-                text.x = cardX + cardWidth / 2;
-                text.y = cardY + cardHeight / 2;
-                text.textBaseline = "middle";
-                text.textAlign = "center";
-                g_stage.addChild(text);
+                addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, false);
             }
 
             function onCardClick(event, cardTitle) {
