@@ -17,6 +17,8 @@
         </style>
 
         <script>
+            "use strict";
+            
             var g_stage;
             var g_selectedCardTitle = "";
             
@@ -63,7 +65,7 @@
                     respondToClick = true;
                 }
                 
-                cardRoundedRadius = width * 0.05;
+                var cardRoundedRadius = width * 0.05;
 
                 var rect = new createjs.Shape();
                 rect.graphics
@@ -97,19 +99,19 @@
 
             function addCards() {
               
-                cardsInRow = 3;
-                cardsInColumn = 3;
+                var cardsInRow = 3;
+                var cardsInColumn = 3;
                 
-                cardPaddingPercentage = 0.05;
+                var cardPaddingPercentage = 0.05;
                 
-                cardRegionWidth = g_stage.canvas.width / cardsInRow;
-                cardRegionHeight = g_stage.canvas.height / cardsInColumn;
+                var cardRegionWidth = g_stage.canvas.width / cardsInRow;
+                var cardRegionHeight = g_stage.canvas.height / cardsInColumn;
                 
-                cardWidthPadding = cardRegionWidth * cardPaddingPercentage;
-                cardHeightPadding = cardRegionHeight * cardPaddingPercentage;
+                var cardWidthPadding = cardRegionWidth * cardPaddingPercentage;
+                var cardHeightPadding = cardRegionHeight * cardPaddingPercentage;
                 
-                cardWidth = cardRegionWidth * ( 1 - cardPaddingPercentage*2 );
-                cardHeight = cardRegionHeight * ( 1 - cardPaddingPercentage*2 );
+                var cardWidth = cardRegionWidth * ( 1 - cardPaddingPercentage*2 );
+                var cardHeight = cardRegionHeight * ( 1 - cardPaddingPercentage*2 );
 
                 var cardValues = [ "XS", "S", "M", "L", "XL" ];
                 var curCardValueIndex = 0;
@@ -117,10 +119,10 @@
                 for (var y = 0; y < 3; y++) {
                     for (var x = 0; x < 3; x++) {
 
-                        cardTitle = cardValues[curCardValueIndex];
+                        var cardTitle = cardValues[curCardValueIndex];
 
-                        cardX = cardRegionWidth*x + cardWidthPadding;
-                        cardY = cardRegionHeight*y + cardHeightPadding;
+                        var cardX = cardRegionWidth*x + cardWidthPadding;
+                        var cardY = cardRegionHeight*y + cardHeightPadding;
                         
                         addCard(cardX, cardY, cardWidth, cardHeight, cardTitle);
 
@@ -138,16 +140,16 @@
                     return;
                 }
                 
-                cardPaddingPercentage = 0.1;
+                var cardPaddingPercentage = 0.1;
 
-                cardWidthPadding = g_stage.canvas.width * cardPaddingPercentage;
-                cardHeightPadding = g_stage.canvas.height * cardPaddingPercentage;
+                var cardWidthPadding = g_stage.canvas.width * cardPaddingPercentage;
+                var cardHeightPadding = g_stage.canvas.height * cardPaddingPercentage;
 
-                cardWidth = g_stage.canvas.width - ( cardWidthPadding * 2);
-                cardHeight = g_stage.canvas.height - ( cardHeightPadding * 2);
+                var cardWidth = g_stage.canvas.width - ( cardWidthPadding * 2);
+                var cardHeight = g_stage.canvas.height - ( cardHeightPadding * 2);
                 
-                cardX = cardWidthPadding;
-                cardY = cardHeightPadding;
+                var cardX = cardWidthPadding;
+                var cardY = cardHeightPadding;
                 
                 addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, false);
             }
