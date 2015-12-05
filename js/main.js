@@ -130,7 +130,7 @@ function addCard(x, y, width, height, title, color, onClickEvent) {
 function addCards() {
 
     // Hard-coded amount and layout of cards.
-    var cardValues = [ "XS", "S", "M", "L", "XL" ];
+    var cardValues = [ "XS", "S", "M", "L", "XL", "?" ];
     var cardsInRow = 2;
     var cardsInColumn = 3;
 
