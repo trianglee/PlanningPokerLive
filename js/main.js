@@ -195,6 +195,8 @@ function selectCard(selectedCard) {
         .to({x: cardX, y: cardY, scaleX: scaleX, scaleY: scaleY}, 1500, createjs.Ease.getPowOut(3))
         .call(enableCardClicks);
     // Add some rotation.
+    // This rotation looks quite bad on Android Chrome browser, so disabled
+    // for now.
     //createjs.Tween.get(selectedCard)
     //    .to({rotation: 360}, 1300, createjs.Ease.backOut);
 
@@ -222,8 +224,8 @@ function unselectCard(selectedCard) {
              scaleY: 1}, 1500, createjs.Ease.getPowOut(3))
         .call(enableCardClicks);
     // With rotation.
-    //createjs.Tween.get(selectedCard)
-    //    .to({rotation: 0}, 1300, createjs.Ease.backOut);
+    createjs.Tween.get(selectedCard)
+        .to({rotation: 0}, 1300, createjs.Ease.backOut);
 
     // Undim all other cards.
     g_cards.forEach(function(card) {
