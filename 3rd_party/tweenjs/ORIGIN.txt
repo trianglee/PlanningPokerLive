@@ -1,0 +1,1 @@
+Taken from https://github.com/CreateJS/TweenJS/releases/tag/0.6.1.

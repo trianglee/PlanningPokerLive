@@ -1,9 +1,19 @@
 "use strict";
 
+// EaselJS stage.
 var g_stage;
-var g_selectedCardTitle = null;
 
+// Card which is currently selected.
+var g_selectedCard = null;
+
+// T-shirt image, loaded once and cached.
 var g_tshirtImage;
+
+// A lis of all the cards, at no particular order.
+var g_cards = [];
+
+// True if clicking on cards is currently allowed.
+var g_cardClickAllowed = true;
 
 function init() {
     init1();
@@ -19,6 +29,9 @@ function init2() {
     g_stage = new createjs.Stage("canvas");
     window.addEventListener("resize", resize, false);
     resize();
+    
+    createjs.Ticker.setFPS(60);
+    createjs.Ticker.addEventListener("tick", g_stage);
 }
 
 function resize() {
@@ -29,11 +42,7 @@ function resize() {
 
 function drawEverything() {
     g_stage.removeAllChildren();
-
     addCards();
-    addSelectedCard();
-
-    g_stage.update();
 }
 
 function updateStage() {
@@ -42,20 +51,29 @@ function updateStage() {
 
 function addCard(x, y, width, height, title, color, onClickEvent) {
 
+    var cardContainer = new createjs.Container();
+    
     var cardRoundedRadius = width * 0.05;
 
     var rect = new createjs.Shape();
     rect.graphics
         .beginFill(color)
-        .drawRoundRect(x, 
-                       y, 
+        .drawRoundRect(0, 
+                       0, 
                        width, 
                        height, 
                        cardRoundedRadius);
 
-    rect.on("click", onClickEvent, null, false, title);
+    var cardData = {
+        width: width,
+        height: height,
+        title: title,
+    };
+    cardContainer.cardData = cardData;
 
-    g_stage.addChild(rect);
+    rect.on("click", onClickEvent, cardContainer);
+
+    cardContainer.addChild(rect);
 
     // Required scale from the t-shirt image to the required card 
     // width and height.
@@ -81,18 +99,32 @@ function addCard(x, y, width, height, title, color, onClickEvent) {
     var actualFontSize = actualWidth / baselineWidth * fontSizeForBaselineWidth;
 
     var bitmap = new createjs.Bitmap(g_tshirtImage);
-    bitmap.x = x + xOffset;
-    bitmap.y = y + yOffset;
+    bitmap.x = xOffset;
+    bitmap.y = yOffset;
     bitmap.scaleX = scale;
     bitmap.scaleY = scale;
-    g_stage.addChild(bitmap);
-
+    cardContainer.addChild(bitmap);
+    
     var text = new createjs.Text(title, actualFontSize + "em Arial", "black");
-    text.x = x + width / 2;
-    text.y = y + height * 0.4;
+    text.x = width / 2;
+    text.y = height * 0.4;
     text.textBaseline = "top";
     text.textAlign = "center";
-    g_stage.addChild(text);
+    cardContainer.addChild(text);
+
+    // Set the registration point to the middle of the card.
+    cardContainer.regX = width/2;
+    cardContainer.regY = height/2;
+
+    cardContainer.x = x + cardContainer.regX;
+    cardContainer.y = y + cardContainer.regY;
+    
+    cardData.deckX = cardContainer.x;
+    cardData.deckY = cardContainer.y;
+    
+    g_stage.addChild(cardContainer);
+    
+    return cardContainer;
 }
 
 function addCards() {
@@ -123,7 +155,8 @@ function addCards() {
         var cardX = cardRegionWidth*x + cardWidthPadding;
         var cardY = cardRegionHeight*y + cardHeightPadding;
 
-        addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue", onCardClick);
+        var card = addCard(cardX, cardY, cardWidth, cardHeight, cardTitle, "blue", onCardClick);
+        g_cards.push(card);
 
         x++;
         if (x >= cardsInRow) {
@@ -134,11 +167,9 @@ function addCards() {
 
 }
 
-function addSelectedCard() {
+function selectCard(selectedCard) {
 
-    if (g_selectedCardTitle === null) {
-        return;
-    }
+    g_selectedCard = selectedCard;
 
     var cardPaddingPercentage = 0.1;
 
@@ -148,20 +179,81 @@ function addSelectedCard() {
     var cardWidth = g_stage.canvas.width - ( cardWidthPadding * 2);
     var cardHeight = g_stage.canvas.height - ( cardHeightPadding * 2);
 
-    var cardX = cardWidthPadding;
-    var cardY = cardHeightPadding;
+    // Card's registartion point is at its center. Calculte new X,Y in accordance.
+    var cardX = cardWidthPadding + cardWidth/2;
+    var cardY = cardHeightPadding + cardHeight/2;
+    
+    var scaleX = cardWidth / selectedCard.cardData.width;
+    var scaleY = cardHeight / selectedCard.cardData.height;
+    
+    // Brings the card to the front.
+    g_stage.setChildIndex(selectedCard, g_stage.numChildren-1);
+    
+    // Animate the card to the center.
+    createjs.Tween.get(selectedCard)
+        .call(disableCardClicks)
+        .to({x: cardX, y: cardY, scaleX: scaleX, scaleY: scaleY}, 1500, createjs.Ease.getPowOut(3))
+        .call(enableCardClicks);
+    // Add some rotation.
+    //createjs.Tween.get(selectedCard)
+    //    .to({rotation: 360}, 1300, createjs.Ease.backOut);
 
-    addCard(cardX, cardY, cardWidth, cardHeight, g_selectedCardTitle, "green", onLargeCardClick);
+    // Dim all other cards.
+    g_cards.forEach(function(card) {
+        if (card == selectedCard) {
+            return;
+        }
+        
+        createjs.Tween.get(card)
+            .to({alpha: 0.2}, 500, createjs.Ease.linear);
+    });
 }
 
-function onCardClick(event, cardTitle) {
+function unselectCard(selectedCard) {
 
-    g_selectedCardTitle = cardTitle;
-    drawEverything();
+    g_selectedCard = null;
+
+    // Animate the card back to the deck.
+    createjs.Tween.get(selectedCard)
+        .call(disableCardClicks)
+        .to({x: selectedCard.cardData.deckX, 
+             y: selectedCard.cardData.deckY, 
+             scaleX: 1, 
+             scaleY: 1}, 1500, createjs.Ease.getPowOut(3))
+        .call(enableCardClicks);
+    // With rotation.
+    //createjs.Tween.get(selectedCard)
+    //    .to({rotation: 0}, 1300, createjs.Ease.backOut);
+
+    // Undim all other cards.
+    g_cards.forEach(function(card) {
+        if (card == selectedCard) {
+            return;
+        }
+        
+        createjs.Tween.get(card)
+            .wait(1000)
+            .to({alpha: 1}, 500, createjs.Ease.linear);
+    });
 }
 
-function onLargeCardClick(event, cardTitle) {
+function disableCardClicks() {
+    g_cardClickAllowed = false;
+}
 
-    g_selectedCardTitle = null;
-    drawEverything();
+function enableCardClicks() {
+    g_cardClickAllowed = true;
+}
+
+function onCardClick(event, cardData2) {
+
+    if (!g_cardClickAllowed) {
+        return;
+    }
+    
+    if (g_selectedCard == null) {
+        selectCard(this);
+    } else if (g_selectedCard == this) {
+        unselectCard(this);
+    }
 }
